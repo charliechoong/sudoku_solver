@@ -110,7 +110,7 @@ class Sudoku(object):
             assignment[var] = val
             self.remaining_var_list.remove(var)
             self.domains[var[0]][var[1]] = []
-            is_valid, inferences = self.forward_checking(var, val)
+            is_valid, inferences = self.forward_checking(var, val) #can change to ac3 to try out
             if is_valid: 
                 result = self.recursive_backtrack(assignment)
                 if result != -1:
