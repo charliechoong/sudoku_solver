@@ -14,7 +14,7 @@ class Sudoku(object):
         self.remaining_var_list, self.domains = self.get_variables_and_domains()         
         # neighbours of each unassigned variable
         self.neighbours = self.init_neighbours()
-        #self.binary_constraints = self.init_binary_constraints() # for ac3 inference herustic
+        self.binary_constraints = self.init_binary_constraints() # for ac3 inference heuristic
         
         self.ans = copy.deepcopy(puzzle)       
         
@@ -102,22 +102,23 @@ class Sudoku(object):
         if self.is_completed_assignment():
             return assignment
         var = self.select_unassigned_var() 
-        backup_domains = copy.deepcopy(self.domains)
-        
-        domain = self.order_domain_val(var)
+        #var = self.remaining_var_list[0] #use this to remove MRV
+        domain = self.order_domain_val(var) 
+        #domain = self.domains[var[0]][var[1]] #use this to remove LCV
         for val in domain: 
-            #if True:#self.is_consistent(val, var, assignment):
+            #if self.is_consistent(val, var, assignment):
             assignment[var] = val
             self.remaining_var_list.remove(var)
             self.domains[var[0]][var[1]] = []
-            if self.forward_checking(var, val): 
+            is_valid, inferences = self.forward_checking(var, val)
+            if is_valid: 
                 result = self.recursive_backtrack(assignment)
                 if result != -1:
                     return result                       
-            del assignment[var]   
-                
+            del assignment[var]                  
             self.remaining_var_list.append(var)
-            self.domains = copy.copy(backup_domains)          
+            self.revert_domains(inferences)   
+        self.domains[var[0]][var[1]] = copy.copy(domain)
         return -1
     
     # variable ordering     
@@ -152,6 +153,12 @@ class Sudoku(object):
             if len(self.domains[neighbour[0]][neighbour[1]]) > 1 and value in self.domains[neighbour[0]][neighbour[1]]:
                 total += 1
         return total
+        
+    def revert_domains(self, inferences):
+        for entry in inferences:
+            var, val = entry
+            self.domains[var[0]][var[1]].append(val)
+        inferences = []
     
     # To determine completed assignment, check if there are unassigned variables.
     def is_completed_assignment(self):
@@ -168,41 +175,47 @@ class Sudoku(object):
     
     # heuristic for inference: arc consistency 3
     def ac3(self, variable, value):
+        inferences = list()
         for neighbour in self.neighbours[variable]:
             if value in self.domains[neighbour[0]][neighbour[1]]:
                 self.domains[neighbour[0]][neighbour[1]].remove(value)
+                inferences.append(((neighbour[0],neighbour[1]),value))
                 if self.domains[neighbour[0]][neighbour[1]] == []:
-                    return False
+                    return False, inferences
         queue = self.binary_constraints
         
         while queue:
             var1, var2 = queue.pop(0)
             if var1 not in self.remaining_var_list or var2 not in self.remaining_var_list:
                 continue
-            if self.revise(var1, var2):
+            if self.revise(var1, var2, inferences):
                 if self.domains[var1[0]][var1[1]] == []:
-                    return False
+                    return False, inferences
                 for var in self.neighbours[var1]:
                     if var != var2 and var in self.remaining_var_list:
                         queue.append((var, var1))        
-        return True      
+        return True, inferences     
         
-    def revise(self, var1, var2): 
+    def revise(self, var1, var2, inferences): 
         revised = False
         for val in self.domains[var1[0]][var1[1]]:
             if not any(val != other_val for other_val in self.domains[var2[0]][var2[1]]):
                 self.domains[var1[0]][var1[1]].remove(val)
+                inferences.append(((var1[0],var1[1]),val))
                 revised = True
         return revised
         
     # heuristic for inference: forward checking
     def forward_checking(self, variable, value):
+        inferences = list()
         for neighbour in self.neighbours[variable]:
-            if neighbour in self.remaining_var_list and value in self.domains[neighbour[0]][neighbour[1]]:
-                self.domains[neighbour[0]][neighbour[1]].remove(value)  
-                if self.domains[neighbour[0]][neighbour[1]] == []:
-                    return False
-        return True                
+            x, y = neighbour
+            if neighbour in self.remaining_var_list and value in self.domains[x][y]:
+                self.domains[x][y].remove(value)  
+                inferences.append(((x, y), value))
+                if self.domains[x][y] == []:
+                    return False, inferences
+        return True, inferences                
 
 if __name__ == "__main__":
     # STRICTLY do NOT modify the code in the main function here
