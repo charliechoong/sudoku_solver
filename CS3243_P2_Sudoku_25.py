@@ -123,16 +123,9 @@ class Sudoku(object):
     
     # variable ordering     
     def select_unassigned_var(self):
-        most_constrained_variables = self.minimum_remaining_values()
-
-        most_constraining_variable = most_constrained_variables[0]
-        max_constraining_variables_num = self.degree(most_constraining_variable)
-        for var in most_constrained_variables[1:]:
-            constraining_variables_num = self.degree(var)
-            if constraining_variables_num > max_constraining_variables_num:
-                most_constraining_variable = var
-                max_constraining_variables_num = constraining_variables_num
-        return most_constraining_variable
+        most_constrained_variables = sorted(self.minimum_remaining_values(), key=(lambda var: self.degree(var)),
+                                            reverse=True)
+        return most_constrained_variables[0]
     
     # heuristic for choosing variable: minimum remaining values (MRV)
     def minimum_remaining_values(self):
