@@ -168,7 +168,7 @@ class Sudoku(object):
     def count_conflicts(self, var, value):
         total = 0
         for neighbour in self.neighbours[var]:
-            if len(self.domains[neighbour[0]][neighbour[1]]) > 1 and value in self.domains[neighbour[0]][neighbour[1]]:
+            if len(self.domains[neighbour[0]][neighbour[1]]) > 0 and value in self.domains[neighbour[0]][neighbour[1]]:
                 total += 1
         return total
         
