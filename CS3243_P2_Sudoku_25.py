@@ -123,18 +123,36 @@ class Sudoku(object):
     
     # variable ordering     
     def select_unassigned_var(self):
-        return self.minimum_remaining_values()
+        most_constrained_variables = self.minimum_remaining_values()
+
+        most_constraining_variable = most_constrained_variables[0]
+        max_constraining_variables_num = self.degree(most_constraining_variable)
+        for var in most_constrained_variables[1:]:
+            constraining_variables_num = self.degree(var)
+            if constraining_variables_num > max_constraining_variables_num:
+                most_constraining_variable = var
+                max_constraining_variables_num = constraining_variables_num
+        return most_constraining_variable
     
     # heuristic for choosing variable: minimum remaining values (MRV)
     def minimum_remaining_values(self):
         min_size = 100
-        variable = -1
+        variables = []
         for var in self.remaining_var_list:
             domain_size = len(self.domains[var[0]][var[1]])
             if domain_size != 0 and domain_size < min_size:
                 min_size = domain_size
-                variable = var
-        return variable
+                variables = [var]
+            elif domain_size != 0 and domain_size == min_size:
+                variables.append(var)
+        return variables
+
+    def degree(self, var):
+        count = 0
+        for neighbour in self.neighbours[var]:
+            if neighbour in self.remaining_var_list:
+                count += 1
+        return count
     
     # order domain values for a variable   
     def order_domain_val(self, var):
