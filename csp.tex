@@ -1,58 +1,27 @@
-
-\documentclass[9.5pt]{extarticle}
-
-\usepackage{full page}  % make the margins somewhat smaller than the default
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
 \usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
 \usepackage{amsmath}
-\usepackage{indentfirst}
-\usepackage{color}
-\usepackage{cite}
-\usepackage{wasysym}
-\usepackage{amssymb}
 \usepackage{multirow}
-\usepackage{float}
-\usepackage{lscape}
-\usepackage{alltt} 
-\usepackage{listings}
-\usepackage{booktabs}
-\usepackage{mathtools}
-\usepackage{fancyhdr}
-\usepackage[table,xcdraw]{xcolor}
-
-\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
-\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
-
-\definecolor{dkgreen}{rgb}{0,0.6,0}
-\definecolor{gray}{rgb}{0.5,0.5,0.5}
-\definecolor{mauve}{rgb}{0.58,0,0.82}
-
-
-\usepackage{listings}  %  needed for source code listings
-
-\lstset{frame=tb,
-  language= java,
-  aboveskip=1.5mm,
-  belowskip=1.5mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\small\ttfamily},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  tabsize=2,
-  numbers=left,
-  stepnumber=1,    
-  firstnumber=1,
-  numberfirstline=true
-}
+%\usepackage[margin=0.5in]{geometry}
        
 
 % set the document title, author, and date here.
 %  once set, the \maketitle command (within the document)
 %  will display them nicely
+
 \title{CS3243 Group 25 Project 2: Sudoku Solver using Backtracking Search}
-\author{Choong Jin Yao (A0173247A), Dominic Frank Quek (A0173261L),\\ Yang Shuqi (A0177383U), Yang Yiqing (A0161424A)}
+\author{Choong Jin Yao (A0173247A), Dominic Frank Quek (A0173261L),\\ Yang Shuqi (A0177383U), Yang Yiqing (A0161424N)}
 
 \begin{document}
 \maketitle
@@ -116,7 +85,7 @@ We find it inaccurate and difficult to measure and compare the search space of d
 
 Additionally, we test the variants on the world's hardest Sudoku puzzle that we've found online (Taken from https://www.conceptispuzzles.com/index.aspx?uri=info/article/424).
 
-\begin{figure}[H]
+\begin{figure}
 \centering
 \includegraphics[scale=0.9]{hardest_sudoku.png}
 \caption{World's Hardest Sudoku}
@@ -125,29 +94,75 @@ Additionally, we test the variants on the world's hardest Sudoku puzzle that we'
 
 \section{Results and Discussion}
 
- The results for runtime performance is given in Table 1, number of nodes explored is given in Table 2. Note that for runtimes that are larger than 300 seconds, we put a '-' symbol.\\
+ The results for runtime performance is given in Table 1, number of nodes explored is given in Table 2. Note that for runtimes that are longer than 300 seconds, we put a '-' symbol.\\
 
-As can be observed from Table 1, FC+MRV+ LCV has the fastest overall run time for the sudoku problem, even though it is slower than AC3+MRV+LCV for input 1. This could be due to the uniqueness of input 1. It also seems like LCV, instead of speeding things up, actually slow things down. A possible explanation is the sorting algorithm used in \verb`orderDomainValues` introduced a \verb`nlog(n)` factor to the runtime, thus slowing things down. FC might be faster than AC-3 because it tracks fewer nodes when checking for consistency. In addition, if there is an inconsistency caused by an assigned variable, usually it will be detected near the assigned variable instead of further away. It is interesting to note that the hard sudoku problem can only be solved within a minute when there is FC or MRV with AC-3 heuristic involved. It is also interesting to note that the number of nodes explored is the least for FC+MRV. Again, FC and MRV reduces the number of node explored while LCV increases the number of nodes explored. Therefore, overall FC and MRV gives the greatest improvement in runtime. If the\\
+As can be observed from Table 1, FC+MRV+LCV and AC3+MRV+LCV have the fastest overall run times for the Sudoku puzzle. Between these 2 variants, FC+MRV+LCV is faster for easier puzzles, whereas AC3+MRV+LCV is faster for harder puzzles. This is because AC3 leads to a significant reduction in search space, especially for harder puzzles with enormous search space. For simpler puzzles, however, ie. input1 and hardest, the reduction in runtime due to smaller search space in AC3 could be outweighed by the reduction in runtime due to less node traversal and computation in FC. This is due to the amount of computation needed per assignment as explained above. AC3 has to ensure arc consistency between every 2 variables, whereas FC simply ensures consistency between a certain variable and other variables. This is further confirmed when you compare AC3 and FC as seen in the last 2 columns of Table 1.
 
-\begin{table}[H]
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}rccccccccccc@{}}
-\toprule
-Run time (seconds)   & MRV  & FC   & FC+LCV  & FC+MRV   & FC+MRV+LCV      & MRV+LCV & AC3     & AC3+MRV+LCV & AC3+MRV & AC3+LCV\\ \midrule
-Sudoku (input1)        & 0.07 &-        & -           & 0.915    & 0.347                  & -                  & -         & 0.251            & 0.612 &-       \\
-Sudoku (input2)        & -      &9.311 & 0.093    &0.013      &0.003                & 17.46              & 0.141    & 0.015           & 0.023 & 0.030     \\  
-Sudoku (input3)        & 0.07& 0.109 & 0.142   &0.002     & 0.002              & 0.31                 & 0.023   & 0.023            & 0.023 & 0.023      \\
-Sudoku (input4)        & -      & 0.357 &0.925  &0.003       &0.003                & 17.46               & 0.024    & 0.016           & 0.011 & 0.018     \\ 
-Sudoku (hardest)      &       &           &          &            & \\
-\bottomrule
-\end{tabular}
-}
-\centering
-\caption{Experiments performed to measure runtime with various heuristic on Sunfire}
-\label{my-label}
-\end{table}
+Implementing Degree heuristic, denoted as D in the table, slows down the search instead of speeding it up. This is evident in column 1(with D) and column 3(without D), as well as in column 2(with D) and column 4(without D). This is because the increase in time spent on computing the degree of every variable outweighs the reduction in time due to smaller search space. In fact, the purpose of the Degree heuristic is merely for tie-breaking for MRV. The extra work of computing the degree is not worth it. 
+
+It can also be noted that MRV and LCV play a significant role in the decrease in runtime. If we were to take both of them away, the runtime of the search will be significantly increased.  
+
+\begin{figure}[ht]
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|  } 
+        \hline
+        Run time (seconds)        &FC+MRV+LCV+D   &AC3+MRV+LCV+D   &FC+MRV+LCV   &AC3+MRV+LCV     \\
+        \hline
+        \multirow{3}{0em}{} 
+Sudoku (input1)             &0.912		 &0.826  			&0.347		 &0.251		     		\\
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (input2)             &0.082	          	 &0.085		        &0.003		 &0.016		    	 \\
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (input3)             & 0.023    		 &0.009		        &0.052		 &0.002		    	  \\
+
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (input4)             & 0.018     		 &0.012		        &0.019	  	 &0.003		    		  \\
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (hardest)          &0.901			 &0.825	  		&0.349		 &0.253		     	\\
+        \hline
+        \end{tabular}\\
+        \caption{Experiments performed to measure runtime with various heuristics on Sunfire}
+    \end{center}
+\end{figure}
+
+
+
+\begin{figure}[ht]
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|  } 
+        \hline
+        Run time (seconds)       &FC+MRV     &FC+LCV	&AC3+MRV  &AC3+LCV	&AC3       &FC \\
+        \hline
+        \multirow{3}{0em}{} 
+Sudoku (input1)             		&0.912  &-		&0.616	 &-			&120.42   &236.654 \\
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (input2)              &	0.013	&0.095	&0.022	&0.033		&0.141     &0.520    \\
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (input3)             		&0.023	&0.002	&0.146	&0.023		&0.023     &0.110    \\
+
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (input4)             		 &0.011&0.003	&0.802	&0.011		&0.018	&0.350   \\
+        \hline
+        \multirow{2}{0em}{} 
+Sudoku (hardest)          &	0.926	&-		&0.614	&-	       		&120.390  &236.671\\
+        \hline
+        \end{tabular}\\
+        \caption{Experiments performed to measure runtime with various heuristics on Sunfire}
+    \end{center}
+\end{figure}
+
+\section{Further Evaluation between FC+MRV+LCV and AC3+MRV+LCV}
+If we must decide between these 2 variants, we will choose AC3+MRV+LCV. Our reasoning is that even though this variant may be slower for simpler puzzles, the difference in time is really small ($\leq 0.1s$). For complex puzzles, however, the time difference is much larger, up to 2 times faster(compare last 2 columns in Table 1). Using the stronger but more computationally expensive AC3 is preferred to FC.
 
 \section{Conclusion}
+Implementing heuristics are a very useful aspect of search algorithms. Backtracking search alone may take a long time to solve a Sudoku puzzle, but with the help of effective heuristics, the enormous search space can be quickly pruned to reduce the search time significantly. 
 
 
 
