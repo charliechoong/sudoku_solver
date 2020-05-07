@@ -34,9 +34,9 @@ CSP search algorithm uses the structure of states and heuristics to solve proble
 
 The puzzle is modeled as a list of 81 cells where each cell is represented by a (x, y) coordinate where $ 1\leq \verb`x,y` \leq 9$. Every cell is assigned a value \verb`v` where  $ 0\leq \verb`v` \leq 9$. An empty cell is where $v = 0$. The variables are the coordinates of empty cells in the given input puzzle. A list \verb`unassigned_var_list` contains the unassigned variables. The constraints are that for any of the 9 rows, 9 columns and 9 diagonals, no value can appear more than once. To enforce this constraint, at the start, we initialise 27 lists containing the legal values for each row, column and diagonal after removing the pre-assigned values in the given input puzzle. Then, we keep track of the domain of each variable containing the legal values. The domains are updated to be consistent with the 27 lists. 
 
-Afterwards, we begin the backtracking search algorithm. When a value is assigned to a variable, the variable is removed from \verb`unassigned_var_list` and its domain becomes empty. After every assignment, we use heuristics to remove illegal values from the domains of neighbouring variables. Hence, the constraints are guaranteed not to be violated throughout.
+Afterwards, we begin the backtracking algorithm. A state is represented by the \verb`unassigned_var_list` and \verb`assignments`. When a value is assigned to a variable, the variable is removed from \verb`unassigned_var_list`, its domain becomes empty and \verb`assignments` is updated. After every assignment, we use heuristics to remove illegal values from the domains of neighbouring variables. Hence, the constraints are guaranteed not to be violated throughout.
 
-An assignment is complete when the  \verb`unassigned_var_list` is empty. Afterwhich, we add the assignments to the original puzzle.
+An assignment is complete when the  \verb`unassigned_var_list` is empty. Afterwhich, we add the \verb`assignments` to the original puzzle.
 
 \section{Algorithm variants}
 We implemented a backtracking solver that incorporates heuristics in 3 aspects: Variable Ordering, Value Ordering and Inference
