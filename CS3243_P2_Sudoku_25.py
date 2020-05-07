@@ -14,7 +14,7 @@ class Sudoku(object):
         self.remaining_var_list, self.domains = self.get_variables_and_domains()         
         # neighbours of each unassigned variable
         self.neighbours = self.init_neighbours()
-        self.binary_constraints = self.init_binary_constraints() # for ac3 inference heuristic
+        #self.binary_constraints = self.init_binary_constraints() # for ac3 inference heuristic
         
         self.ans = copy.deepcopy(puzzle)       
         
@@ -106,11 +106,10 @@ class Sudoku(object):
         domain = self.order_domain_val(var) 
         #domain = self.domains[var[0]][var[1]] #use this to remove LCV
         for val in domain: 
-            #if self.is_consistent(val, var, assignment):
             assignment[var] = val
             self.remaining_var_list.remove(var)
             self.domains[var[0]][var[1]] = []
-            is_valid, inferences = self.forward_checking(var, val) #can change to ac3 to try out
+            is_valid, inferences = self.forward_checking(var, val) # insert FC or AC-3
             if is_valid: 
                 result = self.recursive_backtrack(assignment)
                 if result != -1:
@@ -123,19 +122,26 @@ class Sudoku(object):
     
     # variable ordering     
     def select_unassigned_var(self):
+        return self.minimum_remaining_values()
+        '''
         most_constrained_variables = sorted(self.minimum_remaining_values(), key=(lambda var: self.degree(var)),
                                             reverse=True)
         return most_constrained_variables[0]
+        '''
     
     # heuristic for choosing variable: minimum remaining values (MRV)
     def minimum_remaining_values(self):
         min_size = 100
+        variable = -1
         variables = []
         for var in self.remaining_var_list:
             domain_size = len(self.domains[var[0]][var[1]])
             if domain_size != 0 and domain_size < min_size:
                 min_size = domain_size
-                variables = [var]
+                variable = var
+        return variable
+        '''
+                 variables = [var]
             elif domain_size != 0 and domain_size == min_size:
                 variables.append(var)
         return variables
@@ -146,6 +152,7 @@ class Sudoku(object):
             if neighbour in self.remaining_var_list:
                 count += 1
         return count
+        '''
     
     # order domain values for a variable   
     def order_domain_val(self, var):
