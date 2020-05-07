@@ -36,23 +36,20 @@ The puzzle is modeled as a list of 81 cells where each cell is represented by a 
 
 Afterwards, we begin the backtracking search algorithm. When a value is assigned to a variable, the variable is removed from \verb`unassigned_var_list` and its domain becomes empty. After every assignment, we use heuristics to remove illegal values from the domains of neighbouring variables. Hence, the constraints are guaranteed not to be violated throughout.
 
+An assignment is complete when the  \verb`unassigned_var_list` is empty. Afterwhich, we add the assignments to the original puzzle.
+
 \section{Algorithm variants}
-We implemented a backtracking solver that incorporates heuristics in 3 aspects: 
-
-1) Variable ordering: choosing the most constrained variable with Minimum Remaining Values (MRV) heuristic with/without tie-breaking with Degree heuristic
-
-2) Value ordering: Least Constraining Value (LCV) heuristic 
-
-3) Inference: Forward Checking or Arc Consistency-3(AC3)
+We implemented a backtracking solver that incorporates heuristics in 3 aspects: Variable Ordering, Value Ordering and Inference
 
 \subsection{Variable Ordering}
 We prioritized the variable for expansion that is the most constrained. For this, we experimented with 2 heuristics: Minimum Remaining Value (MRV) and Degree.
 
-\subsubsection{Most Constrained Variable: Minimum Remaining Value}
+\subsubsection{Most Constrained Variable: Minimum Remaining Value} 
 
 Minimum Remaining Value chooses the variable with the least number of legal values. This is simply the variable with the smallest domain size. MRV is implemented in the function \verb`minimum_remaining_values`.
 
 \subsubsection{Most Constraining Variable: Degree}
+
 Degree heuristic acts as a tie-breaker for the MRV heuristic. Among variables that have least and equal domain sizes, the variable with the most unassigned neighbours is prioritized. Degree heuristic is implemented in the function \verb`degree`. 
 
 \subsection{Value Ordering: Least Constraining Value}
