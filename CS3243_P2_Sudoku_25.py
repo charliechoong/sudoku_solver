@@ -14,7 +14,7 @@ class Sudoku(object):
         self.remaining_var_list, self.domains = self.get_variables_and_domains()         
         # neighbours of each unassigned variable
         self.neighbours = self.init_neighbours()
-        #self.binary_constraints = self.init_binary_constraints() # for ac3 inference heuristic
+        self.binary_constraints = self.init_binary_constraints() # for ac3 inference heuristic
         
         self.ans = copy.deepcopy(puzzle)       
         
@@ -122,13 +122,14 @@ class Sudoku(object):
     
     # variable ordering     
     def select_unassigned_var(self):
+        
         return self.minimum_remaining_values()
         '''
         most_constrained_variables = sorted(self.minimum_remaining_values(), key=(lambda var: self.degree(var)),
                                             reverse=True)
         return most_constrained_variables[0]
         '''
-    
+            
     # heuristic for choosing variable: minimum remaining values (MRV)
     def minimum_remaining_values(self):
         min_size = 100
@@ -139,12 +140,14 @@ class Sudoku(object):
             if domain_size != 0 and domain_size < min_size:
                 min_size = domain_size
                 variable = var
+                
         return variable
         '''
-                 variables = [var]
+                variables = [var]
             elif domain_size != 0 and domain_size == min_size:
                 variables.append(var)
         return variables
+        '''
 
     def degree(self, var):
         count = 0
@@ -152,7 +155,7 @@ class Sudoku(object):
             if neighbour in self.remaining_var_list:
                 count += 1
         return count
-        '''
+        
     
     # order domain values for a variable   
     def order_domain_val(self, var):
@@ -194,14 +197,15 @@ class Sudoku(object):
     # heuristic for inference: arc consistency 3
     def ac3(self, variable, value):
         inferences = list()
-        for neighbour in self.neighbours[variable]:
-            if value in self.domains[neighbour[0]][neighbour[1]]:
-                self.domains[neighbour[0]][neighbour[1]].remove(value)
-                inferences.append(((neighbour[0],neighbour[1]),value))
-                if self.domains[neighbour[0]][neighbour[1]] == []:
-                    return False, inferences
-        queue = self.binary_constraints
         
+        '''
+        #use FC as pre-processing to determine failure
+        is_valid, inferences = self.forward_checking(variable, value)
+        if is_valid == False:
+            return False, inferences
+        '''
+        
+        queue = self.binary_constraints
         while queue:
             var1, var2 = queue.pop(0)
             if var1 not in self.remaining_var_list or var2 not in self.remaining_var_list:
