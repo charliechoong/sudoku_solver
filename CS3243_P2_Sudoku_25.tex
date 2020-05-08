@@ -32,9 +32,9 @@
 \section{Problem Specification}
 CSP search algorithm uses the structure of states and heuristics to solve problems. We are given the task of implementing a Sudoku solver using backtracking algorithm and heuristics. 
 
-The puzzle is modeled as a list of 81 cells where each cell is represented by a (x, y) coordinate where $ 1\leq \verb`x,y` \leq 9$. Every cell is assigned a value \verb`v` where  $ 0\leq \verb`v` \leq 9$. An empty cell is where $v = 0$. The variables are the coordinates of empty cells in the given input puzzle. A list \verb`unassigned_var_list` contains the unassigned variables. The constraints are that for any of the 9 rows, 9 columns and 9 diagonals, no value can appear more than once. To enforce this constraint, at the start, we initialise 27 lists containing the legal values for each row, column and diagonal after removing the pre-assigned values in the given input puzzle. Then, we keep track of the domain of each variable containing the legal values. The domains are updated to be consistent with the 27 lists. 
+The puzzle is modeled as a list of 81 cells where each cell is represented by a (x, y) coordinate where $ 1\leq \verb`x,y` \leq 9$. Every cell is assigned a value \verb`v` where  $ 0\leq \verb`v` \leq 9$. An empty cell is where $v = 0$. The variables are the coordinates of empty cells in the given input puzzle. A list \verb`unassigned_var_list` contains the unassigned variables. The constraints are that for any of the 9 rows, 9 columns and 9 subgrids, no value can appear more than once. To enforce this constraint, at the start, we initialise 27 lists containing the legal values for each row, column and subgrid after removing the pre-assigned values in the given input puzzle. Then, we keep track of the domain of each variable containing its legal values. The domains are updated to be consistent with the 27 lists. 
 
-Afterwards, we begin the backtracking algorithm. A state is represented by the \verb`unassigned_var_list` and \verb`assignments`. When a value is assigned to a variable, the variable is removed from \verb`unassigned_var_list`, its domain becomes empty and \verb`assignments` is updated. After every assignment, we use heuristics to remove illegal values from the domains of neighbouring variables. Hence, the constraints are guaranteed not to be violated throughout.
+Afterwards, we begin the backtracking algorithm. A state is represented by the \verb`unassigned_var_list` and \verb`assignments`. When a value is assigned to a variable, the variable is removed from \verb`unassigned_var_list`, its domain becomes empty and \verb`assignments` is updated. After every assignment, we use heuristics to remove illegal values from the domains of neighbouring variables. Hence, the constraints are guaranteed to be non-violated throughout.
 
 An assignment is complete when the  \verb`unassigned_var_list` is empty. Afterwhich, we add the \verb`assignments` to the original puzzle.
 
@@ -42,11 +42,11 @@ An assignment is complete when the  \verb`unassigned_var_list` is empty. Afterwh
 We implemented a backtracking solver that incorporates heuristics in 3 aspects: Variable Ordering, Value Ordering and Inference
 
 \subsection{Variable Ordering}
-We prioritized the variable for expansion that is the most constrained. For this, we experimented with 2 heuristics: Minimum Remaining Value (MRV) and Degree.
+We prioritized the variable for expansion that is the most constrained.
 
-\subsubsection{Most Constrained Variable: Minimum Remaining Value} 
+\subsubsection{Most Constrained Variable: Minimum Remaining Value (MRV)} 
 
-Minimum Remaining Value chooses the variable with the least number of legal values. This is simply the variable with the smallest domain size. MRV is implemented in the function \verb`minimum_remaining_values`.
+MRV chooses the variable with the least number of legal values, or equivalenty, smallest domain size. MRV is implemented in the function \verb`minimum_remaining_values`.
 
 \subsubsection{Most Constraining Variable: Degree}
 
@@ -56,11 +56,9 @@ Degree heuristic acts as a tie-breaker for the MRV heuristic. Among variables th
 
 Least Constraining Value heuristic prioritizes the value of a variable that results in the minimum reduction in the domains of neighbouring variables. In our implementation, we count the number of conflicts between the value and the values of its neighbours. A conflict happens when the value of the target variable is contained in the domain of its neighbour. The value with the least number of conflicts is prioritized. 
 
-
 \subsection{Inference}
 
 Inference is effective in reducing the domains of variables. Whenever a value is assigned to a variable, we can infer new domain reductions on its neighbouring variables. We have experimented with 2 variants: Forward Checking (FC) and Arc Consistency (AC-3). 
-
 
 \subsubsection{Forward Checking}
 
@@ -87,11 +85,11 @@ We also test the variants on the world's hardest Sudoku puzzle(Fig 1) found onli
 
 \section{Results and Discussion}
 
- The results for runtime performance are given in Fig 2 and 3. Runtimes longer than 300 seconds are indicated by a '-' symbol.
+The results for runtime performance are given in Fig 2 and 3. Runtimes longer than 300 seconds are indicated by a '-' symbol.
 
-From Fig 2, FC+MRV+LCV and AC3+MRV+LCV have the fastest overall run times for the Sudoku puzzle. Between these 2 variants, FC+MRV+LCV is faster for easier puzzles, whereas AC3+MRV+LCV is faster for harder puzzles. This is because AC3 leads to a significant reduction in search space, especially for harder puzzles with enormous search space. For simpler puzzles, however, ie. input1 and hardest, the reduction in runtime due to smaller search space in AC3 is outweighed by the reduction in runtime due to less node traversal and computation in FC. This is due to the amount of computation needed per assignment. AC3 has to ensure arc consistency between every 2 variables, whereas FC simply ensures consistency between a certain variable and other variables. This is further confirmed when you compare AC3 and FC in Fig 3.
+FC+MRV+LCV and AC3+MRV+LCV have the fastest overall runtimes. Between these 2 variants, FC+MRV+LCV is faster for easier puzzles(input2, 3, 4), whereas AC3+MRV+LCV is faster for harder puzzles(input1, hardest). This is because AC3 leads to a chain reaction of domain reductions and thus detects failures faster than FC. Especially for hard puzzles, it enforces early termination and decreases the time for checking invalid assignments significantly. For simple puzzles, however, the reduction in runtime due to smaller search space in AC3 is outweighed by the reduction in runtime due to less node traversal and computation in FC. This is due to the amount of computation needed per assignment. AC3 has to ensure arc consistency between every 2 variables, whereas FC simply ensures consistency between a certain variable and other variables. This is further confirmed when you compare AC3 and FC in Fig 3.
 
-Implementing Degree heuristic, denoted by D , slows down the search. This is because the increase in time spent on computing the degree of every variable outweighs the reduction in time due to smaller search space. In fact, the purpose of the Degree heuristic is merely for tie-breaking for MRV. The extra work of computing the degree is not worth it. 
+Implementing Degree heuristic, denoted by D, slows down the search. This is because the increase in time spent on computing the degree of every variable outweighs the reduction in time due to smaller search space. In fact, the purpose of the Degree heuristic is merely for tie-breaking for MRV. It is not worth the extra work of computing the degree. 
 
 It can also be noted that MRV and LCV play a significant role in the decrease in runtime.  
 
@@ -121,8 +119,6 @@ Sudoku (hardest)          &0.901			 &0.825	  		&0.349		 &0.253\\
         \caption{Experiments performed to measure runtime with various heuristics on Sunfire}
     \end{center}
 \end{figure}
-
-
 
 \begin{figure}[ht]
     \begin{center}
