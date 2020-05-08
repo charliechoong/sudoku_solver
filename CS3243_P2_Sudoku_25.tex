@@ -97,10 +97,10 @@ It can also be noted that MRV and LCV play a significant role in the decrease in
     \begin{center}
         \begin{tabular}{ |c|c|c|c|c|c|c|c|c|  } 
         \hline
-        Run time (seconds)        &FC+MRV+LCV+D   &AC3+MRV+LCV+D   &FC+MRV+LCV   &AC3+MRV+LCV \\
+        Run time (seconds)        &FC+MRV+LCV+D   &AC3+MRV+LCV+D   &FC+MRV+LCV   &FC+AC3+MRV+LCV \\
         \hline
         \multirow{3}{0em}{} 
-Sudoku (input1)             &0.912		 &0.826  			&0.347		 &0.251\\
+Sudoku (input1)             &0.912		         &0.826  			&0.347		 &0.251\\
         \hline
         \multirow{2}{0em}{} 
 Sudoku (input2)             &0.082	          	 &0.085		        &0.003		 &0.016 \\
@@ -124,23 +124,23 @@ Sudoku (hardest)          &0.901			 &0.825	  		&0.349		 &0.253\\
     \begin{center}
         \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|  } 
         \hline
-        Run time (seconds)       &FC+MRV     &FC+LCV	&AC3+MRV  &AC3+LCV	&AC3       &FC \\
+        Run time (seconds)      &AC3+MRV+LCV &FC+MRV     &FC+LCV	&AC3+MRV  &AC3+LCV	&AC3       &FC \\
         \hline
         \multirow{3}{0em}{} 
-Sudoku (input1)             		&0.912  &-		&0.616	 &-			&120.42   &236.654 \\
+Sudoku (input1)             	 &0.020	&0.912  &-		&0.616	 &-			&120.42   &236.654 \\
         \hline
         \multirow{2}{0em}{} 
-Sudoku (input2)              &	0.013	&0.095	&0.022	&0.033		&0.141     &0.520    \\
+Sudoku (input2)                  &0.015  &	0.013	&0.095	&0.022	&0.033		&0.141     &0.520    \\
         \hline
         \multirow{2}{0em}{} 
-Sudoku (input3)             		&0.023	&0.002	&0.146	&0.023		&0.023     &0.110    \\
+Sudoku (input3)             	 &0.017	&0.023	&0.002	&0.146	&0.023		&0.023     &0.110    \\
 
         \hline
         \multirow{2}{0em}{} 
-Sudoku (input4)             		 &0.011&0.003	&0.802	&0.011		&0.018	&0.350   \\
+Sudoku (input4)             	 &0.011	 &0.011&0.003	&0.802	&0.011		&0.018	&0.350   \\
         \hline
         \multirow{2}{0em}{} 
-Sudoku (hardest)          &	0.926	&-		&0.614	&-	       		&120.390  &236.671\\
+Sudoku (hardest)                &0.020  &0.926	&-		&0.614	&-	       		&120.390  &236.671\\
         \hline
         \end{tabular}\\
         \caption{Experiments performed to measure runtime with various heuristics on Sunfire}
